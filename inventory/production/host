@@ -1,0 +1,4 @@
+[webservers]
+web-server-1-production  ansible_host=20.237.106.158
+web-server-2-production  ansible_host=20.237.106.158
+web-server-3-production  ansible_host=20.237.106.158

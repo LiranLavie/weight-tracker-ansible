@@ -1,0 +1,74 @@
+  - name: Run the equivalent of "apt-get update" as a separate step
+    apt:
+      update_cache: yes
+
+  - name: Install python
+    ansible.builtin.apt:
+     name: python
+     state: present
+
+  - name: Check if node.js is installed
+    shell: command -v node
+    register: node_exists
+    ignore_errors: yes
+
+  - name: install node.js v14.19.3
+    when: node_exists is failed
+    ansible.builtin.shell:  |
+      curl -sL https://deb.nodesource.com/setup_14.x -o /tmp/nodesource_setup.sh
+      sudo bash /tmp/nodesource_setup.sh
+      sudo apt install nodejs 
+
+  - name: Clone weight tracker app repository
+    ansible.builtin.git:
+     repo: 'https://github.com/LiranLavie/bootcamp-app.git'
+     dest: /home/{{ ansible_user }}/bootcamp-app
+
+
+  - name: Create env file for weight tracker app
+    ansible.builtin.template:
+      src: ~/weight-tracker-ansible/roles/webserver_conf/templates/env.j2
+      dest: /home/{{ ansible_user }}/bootcamp-app/.env
+      owner: root
+      group: root
+      mode: '0644' 
+      
+  - name: Install Dependencies with NPM install command
+    command: chdir=/home/{{ ansible_user }}/bootcamp-app npm install
+
+  - name: Init postgres DB 
+    command: chdir=/home/{{ ansible_user }}/bootcamp-app npm run initdb
+    run_once: true   
+                
+  - name: Copy script for starting weight tracker app when server reboots
+    ansible.builtin.template:
+      src: ~/weight-tracker-ansible/roles/webserver_conf/templates/start_app_script.j2
+      dest: /home/{{ ansible_user }}/start_app_script.sh
+      owner: root
+      group: root
+      mode: '0744'
+
+  - name: Copy service for starting weight tracker app when server reboots
+    ansible.builtin.template:
+      src: ~/weight-tracker-ansible/roles/webserver_conf/templates/app_startup_service.j2
+      dest: /etc/systemd/system/app_startup_service.service
+      owner: root
+      group: root
+      mode: '0744'
+
+  - name: Make sure app_startup_service is started
+    systemd:
+      name: "app_startup_service"
+      state: started 
+      
+  - name: Enable app_startup_service
+    ansible.builtin.service:
+      name: "app_startup_service"
+      enabled: yes                           
+
+
+
+
+  
+
+  

@@ -1,0 +1,16 @@
+---
+
+- hosts: all
+  become: yes
+  #Add posgres server vars
+  vars_files: 
+    - ~/weight-tracker-ansible/inventory/db_vars/dbvars.yml
+  roles:
+    - role: webserver_conf
+  
+
+
+
+  
+
+  

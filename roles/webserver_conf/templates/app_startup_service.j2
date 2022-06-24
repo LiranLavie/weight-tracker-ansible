@@ -1,0 +1,8 @@
+[Unit]
+Description=start weight tracker app on boot
+
+[Service]
+ExecStart=/home/{{ ansible_user }}/start_app_script.sh
+
+[Install]
+WantedBy=multi-user.target
