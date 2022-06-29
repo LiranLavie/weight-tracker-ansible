@@ -1,3 +1,0 @@
-[webservers]
-web-server-1-staging  ansible_host=20.81.114.188
-web-server-2-staging  ansible_host=20.81.114.188
